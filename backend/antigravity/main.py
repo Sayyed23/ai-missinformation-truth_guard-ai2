@@ -1,6 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from .agent import antigravity_agent, AntigravityOutput
+from google.adk.runners import InMemoryRunner
+from google.genai.types import Part, UserContent
+import json
 
 app = FastAPI(title="Antigravity Agent API")
 
@@ -14,26 +17,54 @@ async def verify(request: VerifyRequest):
         # Construct the input for the agent
         prompt = f"Claim: {request.claim}\nImage Requested: {request.image_requested}"
         
-        # Run the agent
-        # We use the agent's run method. 
-        # Assuming ADK agent run returns a response object with an 'output' attribute 
-        # matching the output_schema.
-        response = await antigravity_agent.run(prompt)
+        runner = InMemoryRunner(agent=antigravity_agent)
+        session = await runner.session_service.create_session(
+            app_name=runner.app_name, user_id="api_user"
+        )
+        content = UserContent(parts=[Part(text=prompt)])
         
-        # If response is just the output model (because of output_schema), return it.
-        # If it's a wrapper, access .output or similar.
-        # Based on ADK patterns, if output_schema is set, it might return the object directly or in .output
-        # I'll assume it returns the object or I can cast it.
+        final_text = ""
+        async for event in runner.run_async(
+            user_id=session.user_id,
+            session_id=session.id,
+            new_message=content,
+        ):
+            if event.content and event.content.parts:
+                for part in event.content.parts:
+                    if part.text:
+                        final_text += part.text
         
-        if isinstance(response, AntigravityOutput):
-            return response
-        elif hasattr(response, 'output') and isinstance(response.output, AntigravityOutput):
-            return response.output
-        else:
-             # Fallback if it returns a dict or something else
-             return response
+        # Parse the JSON output
+        # The agent is instructed to output JSON.
+        # We might need to clean it if it contains markdown code blocks.
+        cleaned_text = final_text.strip()
+        if cleaned_text.startswith("```json"):
+            cleaned_text = cleaned_text[7:]
+        elif cleaned_text.startswith("```"):
+            cleaned_text = cleaned_text[3:]
+        
+        if cleaned_text.endswith("```"):
+            cleaned_text = cleaned_text[:-3]
+            
+        cleaned_text = cleaned_text.strip()
+        
+        try:
+            data = json.loads(cleaned_text)
+            return AntigravityOutput(**data)
+        except json.JSONDecodeError:
+             # Fallback: try to find JSON object if there's extra text
+            start = cleaned_text.find('{')
+            end = cleaned_text.rfind('}')
+            if start != -1 and end != -1:
+                json_str = cleaned_text[start:end+1]
+                data = json.loads(json_str)
+                return AntigravityOutput(**data)
+            else:
+                raise ValueError(f"Could not parse JSON from response: {cleaned_text}")
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

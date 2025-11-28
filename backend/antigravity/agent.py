@@ -3,7 +3,7 @@ import uuid
 from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
 
-from google.adk.agents import LlmAgent
+from google.adk import Agent
 from google.adk.tools import google_search
 from .config import config
 
@@ -88,11 +88,11 @@ Task: Given an input claim, perform the following steps:
 10. Return JSON matching schema.
 """
 
-antigravity_agent = LlmAgent(
+antigravity_agent = Agent(
     name="antigravity_agent",
     model=config.model,
     description="Evidence-first verification agent.",
     instruction=SYSTEM_PROMPT,
     tools=[google_search],
-    output_schema=AntigravityOutput
+    # output_schema=AntigravityOutput
 )
