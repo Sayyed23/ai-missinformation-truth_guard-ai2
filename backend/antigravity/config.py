@@ -1,6 +1,10 @@
 import os
 from dataclasses import dataclass
 import google.auth
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # To use AI Studio credentials:
 # 1. Create a .env file in the /app directory with:

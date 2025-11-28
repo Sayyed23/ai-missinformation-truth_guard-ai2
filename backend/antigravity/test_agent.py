@@ -12,7 +12,7 @@ async def main():
     prompt = f"Claim: {claim}\nImage Requested: False"
     print(f"Testing claim: {claim}")
     try:
-        response = await antigravity_agent.run(prompt)
+        response = await antigravity_agent.run_async(prompt)
         print("Response received:")
         # Check if response is the model or has output
         if hasattr(response, 'output'):
