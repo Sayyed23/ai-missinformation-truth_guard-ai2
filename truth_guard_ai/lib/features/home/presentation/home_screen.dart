@@ -17,49 +17,57 @@ class _HomeScreenState extends State<HomeScreen> {
       "title": "Misleading Health Cure",
       "description":
           "A viral post claimed drinking turmeric water cures COVID-19, which is false.",
-      "image": "https://picsum.photos/seed/1/800/400",
+      "image":
+          "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=800&q=80",
     },
     {
       "title": "Fake Political Statement",
       "description":
           "A screenshot went viral showing a politician supposedly saying false info.",
-      "image": "https://picsum.photos/seed/2/800/400",
+      "image":
+          "https://images.unsplash.com/photo-1529101091760-6149d4c81f22?auto=format&fit=crop&w=800&q=80",
     },
     {
       "title": "False Education Claim",
       "description":
           "A rumor claimed schools are giving free laptops to students, but it’s not verified.",
-      "image": "https://picsum.photos/seed/3/800/400",
+      "image":
+          "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
     },
     {
       "title": "Fake Vaccine Myth",
       "description":
           "A post claimed vaccines cause infertility, which is scientifically false.",
-      "image": "https://picsum.photos/seed/4/800/400",
+      "image":
+          "https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?auto=format&fit=crop&w=800&q=80",
     },
     {
       "title": "Misleading Weather Alert",
       "description":
           "A viral video showed fake images predicting a cyclone in India, which is incorrect.",
-      "image": "https://picsum.photos/seed/5/800/400",
+      "image":
+          "https://images.unsplash.com/photo-1560564203-720488f217b9?auto=format&fit=crop&w=800&q=80",
     },
     {
       "title": "Fake Celebrity Statement",
       "description":
           "A viral tweet falsely claimed a celebrity endorsed a product scam.",
-      "image": "https://picsum.photos/seed/6/800/400",
+      "image":
+          "https://images.unsplash.com/photo-1516280440614-6697288d5d38?auto=format&fit=crop&w=800&q=80",
     },
     {
       "title": "False Technology News",
       "description":
           "Rumors circulated about a new phone feature being dangerous, which is untrue.",
-      "image": "https://picsum.photos/seed/7/800/400",
+      "image":
+          "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80",
     },
     {
       "title": "Misleading Environmental Claim",
       "description":
           "A post suggested planting trees will immediately reduce global warming, which is exaggerated.",
-      "image": "https://picsum.photos/seed/8/800/400",
+      "image":
+          "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80",
     },
   ];
 
