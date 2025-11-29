@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       body: Stack(
         children: [
           // Background gradient
@@ -53,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             ),
           ),
 
-          // Floating shimmer circles
+          // Decorative floating circles
           Positioned(
             top: -60,
             right: -40,
@@ -84,111 +85,123 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             ),
           ),
 
-          // Entire Scrollable Content Feed
-          Positioned.fill(
+          // 🔵 FIXED HEADER AT TOP
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
             child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
-                child: ListView(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.95),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Header
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        FadeTransition(
-                          opacity: _fadeText,
-                          child: const Text(
-                            "TruthGuard AI",
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.explore_outlined, color: Colors.black87, size: 28),
-                          onPressed: () {},
-                        )
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Intro card with animation
-                    SlideTransition(
-                      position: _slideCard,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 900),
-                        curve: Curves.easeOutExpo,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.75),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.blueGrey.withOpacity(0.15),
-                              blurRadius: 25,
-                              spreadRadius: 2,
-                              offset: const Offset(0, 8),
-                            )
-                          ],
-                          border: Border.all(color: Colors.blueGrey.withOpacity(0.12)),
-                        ),
-                        child: const Text(
-                          "Trending misinformation spotted today — tap any to analyze.",
-                          style: TextStyle(color: Colors.black54, fontSize: 16),
+                    FadeTransition(
+                      opacity: _fadeText,
+                      child: const Text(
+                        "TruthGuard AI",
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 30),
-
-                    // 🔥 Trending False Claims Feed
-                    ...List.generate(
-                      12,
-                      (index) => Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.90),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.grey.shade200),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "False Claim #${index + 1}",
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            const Text(
-                              "This is a detected misinformation trend circulating online.",
-                              style: TextStyle(color: Colors.black54),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    IconButton(
+                      icon: const Icon(Icons.explore_outlined, color: Colors.black87, size: 28),
+                      onPressed: () {},
+                    )
                   ],
                 ),
               ),
             ),
           ),
 
-          // FIXED QUERY INPUT BAR (always visible)
+          // 🟦 SCROLLABLE FEED BELOW THE FIXED HEADER
+          Positioned.fill(
+            top: 90, // space reserved for fixed header
+            bottom: 90, // space reserved for bottom bar
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ListView(
+                children: [
+                  const SizedBox(height: 10),
+
+                  SlideTransition(
+                    position: _slideCard,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 900),
+                      curve: Curves.easeOutExpo,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.75),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.blueGrey.withOpacity(0.15),
+                            blurRadius: 25,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 8),
+                          )
+                        ],
+                        border: Border.all(color: Colors.blueGrey.withOpacity(0.12)),
+                      ),
+                      child: const Text(
+                        "Trending misinformation spotted today — tap any to analyze.",
+                        style: TextStyle(color: Colors.black54, fontSize: 16),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  // 🔥 Trending items
+                  ...List.generate(
+                    12,
+                    (index) => Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.92),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey.shade200),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "False Claim #${index + 1}",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            "This misinformation trend is currently circulating online.",
+                            style: TextStyle(color: Colors.black54),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // 🟩 FIXED BOTTOM INPUT BAR
           Positioned(
             left: 0,
             right: 0,
@@ -199,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 color: Colors.white.withOpacity(0.97),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: Colors.black.withOpacity(0.1),
                     blurRadius: 20,
                     offset: const Offset(0, -4),
                   ),
