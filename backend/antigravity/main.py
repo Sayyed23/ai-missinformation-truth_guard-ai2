@@ -26,12 +26,13 @@ async def root():
 class VerifyRequest(BaseModel):
     claim: str
     image_requested: bool = False
+    language: str = "English"
 
 @app.post("/verify", response_model=AntigravityOutput)
 async def verify(request: VerifyRequest):
     try:
         # Construct the input for the agent
-        prompt = f"Claim: {request.claim}\nImage Requested: {request.image_requested}"
+        prompt = f"Claim: {request.claim}\nImage Requested: {request.image_requested}\nLanguage: {request.language}"
         
         runner = InMemoryRunner(agent=antigravity_agent)
         session = await runner.session_service.create_session(
@@ -135,6 +136,7 @@ async def verify(request: VerifyRequest):
 class ChatRequest(BaseModel):
     message: str
     session_id: str = "default_session"
+    language: str = "English"
 
 class ChatResponse(BaseModel):
     response: str
@@ -148,7 +150,7 @@ async def chat(request: ChatRequest):
         session = await runner.session_service.create_session(
             app_name=runner.app_name, user_id="api_user", session_id=request.session_id
         )
-        content = UserContent(parts=[Part(text=request.message)])
+        content = UserContent(parts=[Part(text=f"{request.message}\n(Respond in {request.language})")])
         
         final_text = ""
         async for event in runner.run_async(

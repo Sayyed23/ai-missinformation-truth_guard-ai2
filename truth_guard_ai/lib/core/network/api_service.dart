@@ -12,12 +12,17 @@ class ApiService {
   Future<Map<String, dynamic>> verifyClaim(
     String claim, {
     bool imageRequested = false,
+    String language = 'English',
   }) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/verify'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'claim': claim, 'image_requested': imageRequested}),
+        body: jsonEncode({
+          'claim': claim,
+          'image_requested': imageRequested,
+          'language': language,
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -35,12 +40,17 @@ class ApiService {
   Future<Map<String, dynamic>> chat(
     String message, {
     String sessionId = 'default_session',
+    String language = 'English',
   }) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/chat'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'message': message, 'session_id': sessionId}),
+        body: jsonEncode({
+          'message': message,
+          'session_id': sessionId,
+          'language': language,
+        }),
       );
 
       if (response.statusCode == 200) {

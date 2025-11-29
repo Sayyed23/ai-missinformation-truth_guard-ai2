@@ -69,7 +69,11 @@ final GoRouter appRouter = GoRouter(
                   path: 'chat',
                   builder: (BuildContext context, GoRouterState state) {
                     final initialMessage = state.uri.queryParameters['q'];
-                    return ChatScreen(initialMessage: initialMessage);
+                    final initialLanguage = state.uri.queryParameters['lang'];
+                    return ChatScreen(
+                      initialMessage: initialMessage,
+                      initialLanguage: initialLanguage,
+                    );
                   },
                 ),
               ],

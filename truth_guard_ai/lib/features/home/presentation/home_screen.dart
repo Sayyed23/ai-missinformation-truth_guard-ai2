@@ -10,6 +10,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
+  String _selectedLanguage = 'English';
+  final List<String> _languages = ['English', 'Hindi', 'Marathi'];
 
   // Example trending false claims
   final List<Map<String, String>> trendingFalseClaims = [
@@ -136,13 +138,54 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
+          // LANGUAGE SELECTOR
+          Positioned(
+            top: 40,
+            right: 20,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _selectedLanguage,
+                  icon: const Icon(Icons.language, color: Colors.blueAccent),
+                  items: _languages.map((String lang) {
+                    return DropdownMenuItem<String>(
+                      value: lang,
+                      child: Text(
+                        lang,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedLanguage = newValue!;
+                    });
+                  },
+                ),
+              ),
+            ),
+          ),
+
           // FIXED TOP HEADING
           Positioned(
             top: 40,
             left: 20,
-            right: 20,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: const [
                 Text(
                   "TruthGuard AI",
@@ -153,6 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.black87, // Fully dark
                   ),
                 ),
+                SizedBox(width: 8),
                 Icon(Icons.shield_outlined, size: 28, color: Colors.black87),
               ],
             ),
@@ -342,7 +386,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         context.go(
                           Uri(
                             path: '/home/chat',
-                            queryParameters: {'q': text},
+                            queryParameters: {
+                              'q': text,
+                              'lang': _selectedLanguage,
+                            },
                           ).toString(),
                         );
                         _searchController.clear();

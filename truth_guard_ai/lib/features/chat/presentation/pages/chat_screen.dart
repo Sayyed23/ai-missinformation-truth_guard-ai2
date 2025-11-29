@@ -4,7 +4,8 @@ import 'package:truth_guard_ai/core/network/api_service.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   final String? initialMessage;
-  const ChatScreen({super.key, this.initialMessage});
+  final String? initialLanguage;
+  const ChatScreen({super.key, this.initialMessage, this.initialLanguage});
 
   @override
   ConsumerState<ChatScreen> createState() => _ChatScreenState();
@@ -16,10 +17,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       []; // {'role': 'user'|'ai', 'content': '...', 'assessment': '...', 'image_prompt': '...'}
   bool _isLoading = false;
   final ScrollController _scrollController = ScrollController();
+  String _selectedLanguage = 'English';
+  final List<String> _languages = ['English', 'Hindi', 'Marathi'];
 
   @override
   void initState() {
     super.initState();
+    if (widget.initialLanguage != null) {
+      _selectedLanguage = widget.initialLanguage!;
+    }
     if (widget.initialMessage != null && widget.initialMessage!.isNotEmpty) {
       _messageController.text = widget.initialMessage!;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -41,7 +47,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     try {
       final apiService = ref.read(apiServiceProvider);
-      final response = await apiService.chat(message);
+      final response = await apiService.chat(
+        message,
+        language: _selectedLanguage,
+      );
       setState(() {
         _messages.add({
           'role': 'ai',
@@ -94,7 +103,37 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('TruthGuard Chat')),
+      appBar: AppBar(
+        title: const Text('TruthGuard Chat'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedLanguage,
+                icon: const Icon(Icons.language, color: Colors.blueAccent),
+                items: _languages.map((String lang) {
+                  return DropdownMenuItem<String>(
+                    value: lang,
+                    child: Text(
+                      lang,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedLanguage = newValue!;
+                  });
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
