@@ -4,6 +4,7 @@ from .agent import antigravity_agent, antigravity_chat_agent, AntigravityOutput
 from google.adk.runners import InMemoryRunner
 from google.genai.types import Part, UserContent
 import json
+from typing import Optional
 
 from fastapi.middleware.cors import CORSMiddleware
 

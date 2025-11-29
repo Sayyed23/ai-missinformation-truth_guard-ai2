@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -8,7 +9,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeText;
   late Animation<Offset> _slideCard;
@@ -22,13 +24,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       duration: const Duration(milliseconds: 1500),
     )..forward();
 
-    _fadeText = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    _fadeText = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
-    _slideCard = Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutExpo),
-    );
+    _slideCard = Tween<Offset>(
+      begin: const Offset(0, 0.1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutExpo));
   }
 
   @override
@@ -43,11 +47,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             duration: const Duration(seconds: 3),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Color(0xFFE8F5FF),
-                  Color(0xFFF4FBFF),
-                  Colors.white,
-                ],
+                colors: [Color(0xFFE8F5FF), Color(0xFFF4FBFF), Colors.white],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -92,7 +92,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             right: 0,
             child: SafeArea(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.95),
                 ),
@@ -111,9 +114,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.explore_outlined, color: Colors.black87, size: 28),
+                      icon: const Icon(
+                        Icons.explore_outlined,
+                        color: Colors.black87,
+                        size: 28,
+                      ),
                       onPressed: () {},
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -145,9 +152,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             blurRadius: 25,
                             spreadRadius: 2,
                             offset: const Offset(0, 8),
-                          )
+                          ),
                         ],
-                        border: Border.all(color: Colors.blueGrey.withOpacity(0.12)),
+                        border: Border.all(
+                          color: Colors.blueGrey.withOpacity(0.12),
+                        ),
                       ),
                       child: const Text(
                         "Trending misinformation spotted today — tap any to analyze.",
@@ -218,32 +227,40 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   ),
                 ],
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: GestureDetector(
+                onTap: () {
+                  context.go('/home/chat');
+                },
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: const Text(
+                          "Ask Antigravity to verify...",
+                          style: TextStyle(color: Colors.black54, fontSize: 15),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: Colors.blueAccent,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: Colors.grey.shade300),
                       ),
-                      child: const Text(
-                        "Type or paste misinformation…",
-                        style: TextStyle(color: Colors.black87, fontSize: 15),
-                      ),
+                      child: const Icon(LucideIcons.send, color: Colors.white),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.blueAccent,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Icon(Icons.search, color: Colors.white),
-                  )
-                ],
+                  ],
+                ),
               ),
             ),
           ),
