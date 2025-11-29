@@ -18,6 +18,8 @@ import 'package:truth_guard_ai/features/profile_settings/presentation/profile_sc
 import 'package:truth_guard_ai/features/profile_settings/presentation/settings_screen.dart';
 import 'package:truth_guard_ai/features/profile_settings/presentation/support_screen.dart';
 import 'package:truth_guard_ai/features/profile_settings/presentation/about_screen.dart';
+import 'package:truth_guard_ai/features/verification/presentation/pages/verification_screen.dart';
+import 'package:truth_guard_ai/features/chat/presentation/pages/chat_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -55,6 +57,16 @@ final GoRouter appRouter = GoRouter(
                   path: 'saved',
                   builder: (BuildContext context, GoRouterState state) =>
                       const SavedClaimsScreen(),
+                ),
+                GoRoute(
+                  path: 'verify',
+                  builder: (BuildContext context, GoRouterState state) =>
+                      const VerificationScreen(),
+                ),
+                GoRoute(
+                  path: 'chat',
+                  builder: (BuildContext context, GoRouterState state) =>
+                      const ChatScreen(),
                 ),
               ],
             ),

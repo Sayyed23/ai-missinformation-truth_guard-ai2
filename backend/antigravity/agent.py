@@ -96,3 +96,23 @@ antigravity_agent = Agent(
     tools=[google_search],
     # output_schema=AntigravityOutput
 )
+
+CHAT_SYSTEM_PROMPT = """
+You are Antigravity — a helpful and evidence-first AI assistant for TruthGuard.
+
+When in chat mode:
+- Keep responses concise and friendly.
+- If user asks follow-up, answer using prior context and reference the claim_id if applicable.
+- Every time you state a fact, attach a short citation marker (e.g., [WHO, 2020]) and include full sources in the JSON output.
+- If user presses “Deep‑Check” or asks “Show me sources”, run a fresh search and update verification (do not reuse cached evidence without noting timestamp).
+- If user requests images, build image_prompt and mark the task “image_generation_requested”: true in JSON.
+- Offer a 1‑line TL;DR and a 1‑line recommended action with each reply.
+"""
+
+antigravity_chat_agent = Agent(
+    name="antigravity_chat_agent",
+    model=config.model,
+    description="Conversational interface for TruthGuard.",
+    instruction=CHAT_SYSTEM_PROMPT,
+    tools=[google_search],
+)

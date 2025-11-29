@@ -149,21 +149,27 @@ class HomeScreen extends StatelessWidget {
               icon: LucideIcons.search,
               label: 'Verify',
               color: Colors.blue,
-              onTap: () {},
+              onTap: () {
+                context.go('/home/verify');
+              },
             ),
             _buildActionButton(
               context,
-              icon: LucideIcons.upload,
-              label: 'Submit',
+              icon: LucideIcons.messageCircle,
+              label: 'Chat',
               color: Colors.orange,
-              onTap: () {},
+              onTap: () {
+                context.go('/home/chat');
+              },
             ),
             _buildActionButton(
               context,
               icon: LucideIcons.trendingUp,
               label: 'Trends',
               color: Colors.green,
-              onTap: () {},
+              onTap: () {
+                context.go('/trends');
+              },
             ),
             _buildActionButton(
               context,
