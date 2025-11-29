@@ -7,7 +7,7 @@ final apiServiceProvider = Provider((ref) => ApiService());
 class ApiService {
   // Use 10.0.2.2 for Android emulator, localhost for Web/Windows
   // For now, assuming Web/Windows or physical device on same network
-  static const String baseUrl = 'http://localhost:8002';
+  static const String baseUrl = 'http://127.0.0.1:8002';
 
   Future<Map<String, dynamic>> verifyClaim(
     String claim, {
