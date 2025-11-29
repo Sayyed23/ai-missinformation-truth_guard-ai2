@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -9,258 +8,295 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeText;
-  late Animation<Offset> _slideCard;
+class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  // Example trending false claims
+  final List<Map<String, String>> trendingFalseClaims = [
+    {
+      "title": "Misleading Health Cure",
+      "description":
+          "A viral post claimed drinking turmeric water cures COVID-19, which is false.",
+      "image": "https://picsum.photos/seed/1/800/400",
+    },
+    {
+      "title": "Fake Political Statement",
+      "description":
+          "A screenshot went viral showing a politician supposedly saying false info.",
+      "image": "https://picsum.photos/seed/2/800/400",
+    },
+    {
+      "title": "False Education Claim",
+      "description":
+          "A rumor claimed schools are giving free laptops to students, but it’s not verified.",
+      "image": "https://picsum.photos/seed/3/800/400",
+    },
+    {
+      "title": "Fake Vaccine Myth",
+      "description":
+          "A post claimed vaccines cause infertility, which is scientifically false.",
+      "image": "https://picsum.photos/seed/4/800/400",
+    },
+    {
+      "title": "Misleading Weather Alert",
+      "description":
+          "A viral video showed fake images predicting a cyclone in India, which is incorrect.",
+      "image": "https://picsum.photos/seed/5/800/400",
+    },
+    {
+      "title": "Fake Celebrity Statement",
+      "description":
+          "A viral tweet falsely claimed a celebrity endorsed a product scam.",
+      "image": "https://picsum.photos/seed/6/800/400",
+    },
+    {
+      "title": "False Technology News",
+      "description":
+          "Rumors circulated about a new phone feature being dangerous, which is untrue.",
+      "image": "https://picsum.photos/seed/7/800/400",
+    },
+    {
+      "title": "Misleading Environmental Claim",
+      "description":
+          "A post suggested planting trees will immediately reduce global warming, which is exaggerated.",
+      "image": "https://picsum.photos/seed/8/800/400",
+    },
+  ];
 
   @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..forward();
-
-    _fadeText = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
-
-    _slideCard = Tween<Offset>(
-      begin: const Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutExpo));
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       body: Stack(
         children: [
-          // Background gradient
-          AnimatedContainer(
-            duration: const Duration(seconds: 3),
+          // BACKGROUND GRADIENT
+          Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFFE8F5FF), Color(0xFFF4FBFF), Colors.white],
+                colors: [Color(0xFFDCEBFF), Color(0xFFF3F9FF), Colors.white],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
             ),
           ),
 
-          // Decorative floating circles
+          // FLOATING CIRCLES
           Positioned(
             top: -60,
             right: -40,
-            child: AnimatedContainer(
-              duration: const Duration(seconds: 4),
-              curve: Curves.easeInOut,
+            child: Container(
               height: 220,
               width: 220,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.lightBlueAccent.withOpacity(0.18),
+                color: Colors.blueAccent.withOpacity(0.14),
               ),
             ),
           ),
-
           Positioned(
             bottom: -50,
             left: -40,
-            child: AnimatedContainer(
-              duration: const Duration(seconds: 4),
-              curve: Curves.easeInOut,
+            child: Container(
               height: 240,
               width: 240,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.tealAccent.withOpacity(0.15),
+                color: Colors.greenAccent.withOpacity(0.12),
               ),
             ),
           ),
 
-          // 🔵 FIXED HEADER AT TOP
+          // FIXED TOP HEADING
           Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 14,
+            top: 40,
+            left: 20,
+            right: 20,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                Text(
+                  "TruthGuard AI",
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1,
+                    color: Colors.black87, // Fully dark
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.95),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    FadeTransition(
-                      opacity: _fadeText,
-                      child: const Text(
-                        "TruthGuard AI",
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.explore_outlined,
-                        color: Colors.black87,
-                        size: 28,
-                      ),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-              ),
+                Icon(Icons.shield_outlined, size: 28, color: Colors.black87),
+              ],
             ),
           ),
 
-          // 🟦 SCROLLABLE FEED BELOW THE FIXED HEADER
-          Positioned.fill(
-            top: 90, // space reserved for fixed header
-            bottom: 90, // space reserved for bottom bar
-            child: Padding(
+          // TRENDING FALSE CLAIMS LIST
+          Padding(
+            padding: const EdgeInsets.only(top: 110, bottom: 160),
+            child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: ListView(
-                children: [
-                  const SizedBox(height: 10),
-
-                  SlideTransition(
-                    position: _slideCard,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 900),
-                      curve: Curves.easeOutExpo,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.75),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.blueGrey.withOpacity(0.15),
-                            blurRadius: 25,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                        border: Border.all(
-                          color: Colors.blueGrey.withOpacity(0.12),
+              itemCount: trendingFalseClaims.length,
+              itemBuilder: (context, index) {
+                final claim = trendingFalseClaims[index];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 22),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 20,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Image
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(18),
+                          topRight: Radius.circular(18),
+                        ),
+                        child: Image.network(
+                          claim["image"]!,
+                          height: 180,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      child: const Text(
-                        "Trending misinformation spotted today — tap any to analyze.",
-                        style: TextStyle(color: Colors.black54, fontSize: 16),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // 🔥 Trending items
-                  ...List.generate(
-                    12,
-                    (index) => Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.92),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade200),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "False Claim #${index + 1}",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                      // Title + Description
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              claim["title"]!,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black87,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 6),
-                          const Text(
-                            "This misinformation trend is currently circulating online.",
-                            style: TextStyle(color: Colors.black54),
-                          ),
-                        ],
+                            const SizedBox(height: 6),
+                            Text(
+                              claim["description"]!,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                height: 1.45,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ),
 
-          // 🟩 FIXED BOTTOM INPUT BAR
+          // FIXED INPUT BOX AT BOTTOM
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.97),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
-                    blurRadius: 20,
+                    blurRadius: 16,
                     offset: const Offset(0, -4),
                   ),
                 ],
               ),
-              child: GestureDetector(
-                onTap: () {
-                  context.go('/home/chat');
-                },
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Query Input
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.blueGrey.shade200),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
-                        child: const Text(
-                          "Ask TruthGuard to verify...",
-                          style: TextStyle(color: Colors.black54, fontSize: 15),
-                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      maxLines: 3,
+                      style: const TextStyle(color: Colors.black87),
+                      decoration: const InputDecoration(
+                        hintText: "Paste or type misinformation to verify…",
+                        hintStyle: TextStyle(color: Colors.black45),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.all(14),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Container(
-                      padding: const EdgeInsets.all(14),
+                  ),
+                  const SizedBox(height: 12),
+                  // Analyze Button
+                  GestureDetector(
+                    onTap: () {
+                      final text = _searchController.text.trim();
+                      if (text.isNotEmpty) {
+                        context.go(
+                          Uri(
+                            path: '/home/chat',
+                            queryParameters: {'q': text},
+                          ).toString(),
+                        );
+                        _searchController.clear();
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 50,
+                      ),
                       decoration: BoxDecoration(
-                        color: Colors.blueAccent,
                         borderRadius: BorderRadius.circular(14),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF003F7D), Color(0xFF005E8A)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.blueGrey,
+                            blurRadius: 20,
+                            offset: Offset(0, 8),
+                          ),
+                        ],
                       ),
-                      child: const Icon(LucideIcons.send, color: Colors.white),
+                      child: const Text(
+                        "Analyze Now",
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

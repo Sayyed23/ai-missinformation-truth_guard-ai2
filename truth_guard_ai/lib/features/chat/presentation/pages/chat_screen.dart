@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:truth_guard_ai/core/network/api_service.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
-  const ChatScreen({super.key});
+  final String? initialMessage;
+  const ChatScreen({super.key, this.initialMessage});
 
   @override
   ConsumerState<ChatScreen> createState() => _ChatScreenState();
@@ -15,6 +16,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       []; // {'role': 'user'|'ai', 'content': '...', 'assessment': '...', 'image_prompt': '...'}
   bool _isLoading = false;
   final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialMessage != null && widget.initialMessage!.isNotEmpty) {
+      _messageController.text = widget.initialMessage!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _sendMessage();
+      });
+    }
+  }
 
   Future<void> _sendMessage() async {
     final message = _messageController.text.trim();

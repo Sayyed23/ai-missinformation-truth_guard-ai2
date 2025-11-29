@@ -63,10 +63,13 @@ final GoRouter appRouter = GoRouter(
                   builder: (BuildContext context, GoRouterState state) =>
                       const VerificationScreen(),
                 ),
+
                 GoRoute(
                   path: 'chat',
-                  builder: (BuildContext context, GoRouterState state) =>
-                      const ChatScreen(),
+                  builder: (BuildContext context, GoRouterState state) {
+                    final initialMessage = state.uri.queryParameters['q'];
+                    return ChatScreen(initialMessage: initialMessage);
+                  },
                 ),
               ],
             ),

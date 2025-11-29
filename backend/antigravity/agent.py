@@ -29,9 +29,11 @@ class Explanation(BaseModel):
     public_summary: str = Field(..., description="Max 70 words")
     technical_note: str = Field(..., description="Max 250 words")
 
+
 class ImageGeneration(BaseModel):
     requested: bool
     image_prompt: Optional[str] = None
+    generated_image_base64: Optional[str] = None
     width: int = 800
     height: int = 800
     style: str = "flat infographic, bold verdict badge"

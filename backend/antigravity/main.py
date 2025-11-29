@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Antigravity Agent API")
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,6 +18,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/")
+async def root():
+    return {"message": "Antigravity Agent API is running"}
 
 class VerifyRequest(BaseModel):
     claim: str
@@ -59,9 +64,35 @@ async def verify(request: VerifyRequest):
             
         cleaned_text = cleaned_text.strip()
         
+
         try:
             data = json.loads(cleaned_text)
-            return AntigravityOutput(**data)
+            output = AntigravityOutput(**data)
+
+            # Image Generation (Nano Banana / Gemini 2.5 Flash Image)
+            if output.image_generation and output.image_generation.image_prompt:
+                try:
+                    from google.genai import Client
+                    import base64
+                    import os
+                    
+                    client = Client(api_key=os.environ.get("GOOGLE_API_KEY"))
+                    # Using gemini-2.5-flash-image (Nano Banana)
+                    response = client.models.generate_images(
+                        model='gemini-2.5-flash-image',
+                        prompt=output.image_generation.image_prompt,
+                        config={'number_of_images': 1}
+                    )
+                    if response.generated_images:
+                        image_bytes = response.generated_images[0].image.image_bytes
+                        b64_img = base64.b64encode(image_bytes).decode('utf-8')
+                        output.image_generation.generated_image_base64 = b64_img
+                        print("Image generated successfully with Nano Banana.")
+                except Exception as img_err:
+                    print(f"Image generation failed: {img_err}")
+                    # Fallback or just ignore, the prompt is still there
+            
+            return output
         except json.JSONDecodeError:
              # Fallback: try to find JSON object if there's extra text
             start = cleaned_text.find('{')
@@ -69,7 +100,30 @@ async def verify(request: VerifyRequest):
             if start != -1 and end != -1:
                 json_str = cleaned_text[start:end+1]
                 data = json.loads(json_str)
-                return AntigravityOutput(**data)
+                output = AntigravityOutput(**data)
+                
+                # Image Generation (Nano Banana / Gemini 2.5 Flash Image) - Copy of logic
+                if output.image_generation and output.image_generation.image_prompt:
+                    try:
+                        from google.genai import Client
+                        import base64
+                        import os
+                        
+                        client = Client(api_key=os.environ.get("GOOGLE_API_KEY"))
+                        response = client.models.generate_images(
+                            model='gemini-2.5-flash-image',
+                            prompt=output.image_generation.image_prompt,
+                            config={'number_of_images': 1}
+                        )
+                        if response.generated_images:
+                            image_bytes = response.generated_images[0].image.image_bytes
+                            b64_img = base64.b64encode(image_bytes).decode('utf-8')
+                            output.image_generation.generated_image_base64 = b64_img
+                            print("Image generated successfully with Nano Banana.")
+                    except Exception as img_err:
+                        print(f"Image generation failed: {img_err}")
+
+                return output
             else:
                 raise ValueError(f"Could not parse JSON from response: {cleaned_text}")
 
