@@ -50,7 +50,8 @@ final GoRouter appRouter = GoRouter(
                   path: 'claim/:id',
                   builder: (BuildContext context, GoRouterState state) {
                     final id = state.pathParameters['id']!;
-                    return ClaimDetailScreen(claimId: id);
+                    final extra = state.extra as Map<String, String>?;
+                    return ClaimDetailScreen(claimId: id, claimData: extra);
                   },
                 ),
                 GoRoute(

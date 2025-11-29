@@ -4,11 +4,21 @@ import 'package:truth_guard_ai/core/theme/app_colors.dart';
 
 class ClaimDetailScreen extends StatelessWidget {
   final String claimId;
+  final Map<String, String>? claimData;
 
-  const ClaimDetailScreen({super.key, required this.claimId});
+  const ClaimDetailScreen({super.key, required this.claimId, this.claimData});
 
   @override
   Widget build(BuildContext context) {
+    // Use passed data or fallbacks
+    final title = claimData?['title'] ?? 'Claim Analysis';
+    final description =
+        claimData?['description'] ??
+        'New tax law affects all citizens immediately starting from next month.';
+    final verdict = claimData?['verdict'] ?? 'FALSE';
+    final category = claimData?['category'] ?? 'General';
+    final image = claimData?['image'];
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -21,22 +31,54 @@ class ClaimDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildVerdictCard(),
+            if (image != null) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  image,
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: 200,
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(
+                        Icons.broken_image,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+            _buildVerdictCard(verdict),
             const SizedBox(height: 24),
-            const Text(
-              'Claim',
-              style: TextStyle(
+            Text(
+              category,
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: Colors.grey,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'New tax law affects all citizens immediately starting from next month.',
-              style: TextStyle(
+            Text(
+              title,
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              description,
+              style: const TextStyle(
+                fontSize: 16,
+                height: 1.5,
                 color: Colors.black87,
               ),
             ),
@@ -50,23 +92,52 @@ class ClaimDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVerdictCard() {
+  Widget _buildVerdictCard(String verdict) {
+    Color color;
+    IconData icon;
+
+    switch (verdict.toUpperCase()) {
+      case 'FALSE':
+        color = AppColors.error; // Assuming error color is red-ish
+        icon = LucideIcons.xCircle;
+        break;
+      case 'TRUE':
+        color = AppColors.success;
+        icon = LucideIcons.checkCircle;
+        break;
+      case 'MISLEADING':
+        color = Colors.orange;
+        icon = LucideIcons.alertTriangle;
+        break;
+      case 'UNVERIFIED':
+        color = Colors.grey;
+        icon = LucideIcons.helpCircle;
+        break;
+      default:
+        color = AppColors.success;
+        icon = LucideIcons.checkCircle;
+    }
+
+    // Fallback if AppColors.error/success are not what we expect or if we want hardcoded colors for safety
+    if (verdict.toUpperCase() == 'FALSE') color = Colors.redAccent;
+    if (verdict.toUpperCase() == 'TRUE') color = Colors.green;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.success.withValues(alpha: 0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         children: [
-          Icon(LucideIcons.checkCircle, color: AppColors.success, size: 48),
+          Icon(icon, color: color, size: 48),
           const SizedBox(height: 16),
-          const Text(
-            'FALSE',
+          Text(
+            verdict.toUpperCase(),
             style: TextStyle(
-              color: AppColors.success,
+              color: color,
               fontSize: 24,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,

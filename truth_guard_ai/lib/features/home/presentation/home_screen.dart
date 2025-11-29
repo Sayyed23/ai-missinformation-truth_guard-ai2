@@ -183,43 +183,52 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Image
-                      Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(18),
-                              topRight: Radius.circular(18),
-                            ),
-                            child: Image.network(
-                              claim["image"]!,
-                              height: 180,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Positioned(
-                            top: 12,
-                            right: 12,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
+                      GestureDetector(
+                        onTap: () {
+                          // Pass the claim data to the detail screen
+                          context.go(
+                            '/home/claim/1', // Using a dummy ID for now
+                            extra: claim,
+                          );
+                        },
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(18),
+                                topRight: Radius.circular(18),
                               ),
-                              decoration: BoxDecoration(
-                                color: Colors.redAccent,
-                                borderRadius: BorderRadius.circular(20),
+                              child: Image.network(
+                                claim["image"]!,
+                                height: 180,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
                               ),
-                              child: Text(
-                                claim["verdict"]!,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
+                            ),
+                            Positioned(
+                              top: 12,
+                              right: 12,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.redAccent,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  claim["verdict"]!,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       // Title + Description
                       Padding(
