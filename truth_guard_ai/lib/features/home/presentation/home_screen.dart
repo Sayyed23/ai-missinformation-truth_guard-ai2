@@ -19,6 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
           "A viral post claimed drinking turmeric water cures COVID-19, which is false.",
       "image":
           "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=800&q=80",
+      "category": "Health",
+      "verdict": "FALSE",
     },
     {
       "title": "Fake Political Statement",
@@ -26,6 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
           "A screenshot went viral showing a politician supposedly saying false info.",
       "image":
           "https://images.unsplash.com/photo-1529101091760-6149d4c81f22?auto=format&fit=crop&w=800&q=80",
+      "category": "Politics",
+      "verdict": "FALSE",
     },
     {
       "title": "False Education Claim",
@@ -33,6 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
           "A rumor claimed schools are giving free laptops to students, but it’s not verified.",
       "image":
           "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
+      "category": "Education",
+      "verdict": "UNVERIFIED",
     },
     {
       "title": "Fake Vaccine Myth",
@@ -40,6 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
           "A post claimed vaccines cause infertility, which is scientifically false.",
       "image":
           "https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?auto=format&fit=crop&w=800&q=80",
+      "category": "Health",
+      "verdict": "FALSE",
     },
     {
       "title": "Misleading Weather Alert",
@@ -47,6 +55,8 @@ class _HomeScreenState extends State<HomeScreen> {
           "A viral video showed fake images predicting a cyclone in India, which is incorrect.",
       "image":
           "https://images.unsplash.com/photo-1560564203-720488f217b9?auto=format&fit=crop&w=800&q=80",
+      "category": "Weather",
+      "verdict": "MISLEADING",
     },
     {
       "title": "Fake Celebrity Statement",
@@ -54,6 +64,8 @@ class _HomeScreenState extends State<HomeScreen> {
           "A viral tweet falsely claimed a celebrity endorsed a product scam.",
       "image":
           "https://images.unsplash.com/photo-1516280440614-6697288d5d38?auto=format&fit=crop&w=800&q=80",
+      "category": "Entertainment",
+      "verdict": "FALSE",
     },
     {
       "title": "False Technology News",
@@ -61,6 +73,8 @@ class _HomeScreenState extends State<HomeScreen> {
           "Rumors circulated about a new phone feature being dangerous, which is untrue.",
       "image":
           "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80",
+      "category": "Tech",
+      "verdict": "FALSE",
     },
     {
       "title": "Misleading Environmental Claim",
@@ -68,6 +82,8 @@ class _HomeScreenState extends State<HomeScreen> {
           "A post suggested planting trees will immediately reduce global warming, which is exaggerated.",
       "image":
           "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80",
+      "category": "Environment",
+      "verdict": "MISLEADING",
     },
   ];
 
@@ -167,17 +183,43 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Image
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(18),
-                          topRight: Radius.circular(18),
-                        ),
-                        child: Image.network(
-                          claim["image"]!,
-                          height: 180,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
+                      Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(18),
+                              topRight: Radius.circular(18),
+                            ),
+                            child: Image.network(
+                              claim["image"]!,
+                              height: 180,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Positioned(
+                            top: 12,
+                            right: 12,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.redAccent,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                claim["verdict"]!,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       // Title + Description
                       Padding(
@@ -185,6 +227,30 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    claim["category"]!,
+                                    style: const TextStyle(
+                                      color: Colors.blue,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                const Spacer(),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
                             Text(
                               claim["title"]!,
                               style: const TextStyle(
