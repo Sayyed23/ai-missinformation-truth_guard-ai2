@@ -24,3 +24,38 @@ class TruthGuardApp extends StatelessWidget {
     );
   }
 }
+
+// Small sample widget showing the logo asset. This widget isn't wired
+// into routing; it's provided as a quick reference for how to use the
+// `assets/logo.png` file added to `pubspec.yaml`.
+
+class LogoSample extends StatelessWidget {
+  const LogoSample({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('TruthGuard AI'),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 240,
+                height: 240,
+                child: Image.asset('assets/logo.png', fit: BoxFit.contain),
+              ),
+              const SizedBox(height: 16),
+              const Text('TruthGuard AI', style: TextStyle(fontSize: 20)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
