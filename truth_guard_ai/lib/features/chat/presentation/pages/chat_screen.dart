@@ -11,8 +11,8 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
-  final List<Map<String, String>> _messages =
-      []; // {'role': 'user'|'ai', 'content': '...'}
+  final List<Map<String, dynamic>> _messages =
+      []; // {'role': 'user'|'ai', 'content': '...', 'assessment': '...', 'image_prompt': '...'}
   bool _isLoading = false;
   final ScrollController _scrollController = ScrollController();
 
@@ -31,7 +31,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       final apiService = ref.read(apiServiceProvider);
       final response = await apiService.chat(message);
       setState(() {
-        _messages.add({'role': 'ai', 'content': response});
+        _messages.add({
+          'role': 'ai',
+          'content': response['response'],
+          'assessment': response['assessment'],
+          'image_prompt': response['image_prompt'],
+        });
       });
     } catch (e) {
       setState(() {
@@ -57,6 +62,23 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
   }
 
+  Color _getAssessmentColor(String? assessment) {
+    switch (assessment) {
+      case 'NECESSARY':
+        return Colors.redAccent;
+      case 'MISSING_CONTEXT':
+        return Colors.orangeAccent;
+      case 'CORRECT':
+        return Colors.green;
+      case 'UNCERTAIN':
+        return Colors.grey;
+      case 'OFF_TOPIC':
+        return Colors.purpleAccent;
+      default:
+        return Colors.blueAccent;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,6 +93,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               itemBuilder: (context, index) {
                 final msg = _messages[index];
                 final isUser = msg['role'] == 'user';
+                final assessment = msg['assessment'];
+                final imagePrompt = msg['image_prompt'];
+
                 return Align(
                   alignment: isUser
                       ? Alignment.centerRight
@@ -85,7 +110,54 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     constraints: BoxConstraints(
                       maxWidth: MediaQuery.of(context).size.width * 0.8,
                     ),
-                    child: Text(msg['content'] ?? ''),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (!isUser && assessment != null)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _getAssessmentColor(assessment),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              assessment,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        Text(msg['content'] ?? ''),
+                        if (!isUser && imagePrompt != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                // TODO: Implement image generation
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Generating image for: $imagePrompt',
+                                    ),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(Icons.image),
+                              label: const Text('Generate Image'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepPurple,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 );
               },

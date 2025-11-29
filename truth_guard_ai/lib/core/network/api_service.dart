@@ -32,7 +32,7 @@ class ApiService {
     }
   }
 
-  Future<String> chat(
+  Future<Map<String, dynamic>> chat(
     String message, {
     String sessionId = 'default_session',
   }) async {
@@ -44,8 +44,8 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data['response'];
+        // The backend now returns { "response": "...", "assessment": "...", "image_prompt": "..." }
+        return jsonDecode(response.body);
       } else {
         throw Exception(
           'Failed to send message: ${response.statusCode} ${response.body}',

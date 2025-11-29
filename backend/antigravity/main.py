@@ -83,6 +83,8 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     response: str
+    assessment: str
+    image_prompt: Optional[str] = None
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
@@ -104,7 +106,37 @@ async def chat(request: ChatRequest):
                     if part.text:
                         final_text += part.text
         
-        return ChatResponse(response=final_text)
+        # Parse the JSON output
+        cleaned_text = final_text.strip()
+        if cleaned_text.startswith("```json"):
+            cleaned_text = cleaned_text[7:]
+        elif cleaned_text.startswith("```"):
+            cleaned_text = cleaned_text[3:]
+        
+        if cleaned_text.endswith("```"):
+            cleaned_text = cleaned_text[:-3]
+            
+        cleaned_text = cleaned_text.strip()
+        
+        try:
+            data = json.loads(cleaned_text)
+            return ChatResponse(**data)
+        except json.JSONDecodeError:
+             # Fallback: try to find JSON object if there's extra text
+            start = cleaned_text.find('{')
+            end = cleaned_text.rfind('}')
+            if start != -1 and end != -1:
+                json_str = cleaned_text[start:end+1]
+                data = json.loads(json_str)
+                return ChatResponse(**data)
+            else:
+                # Fallback for plain text response (if agent fails to output JSON)
+                return ChatResponse(
+                    response=final_text,
+                    assessment="UNCERTAIN",
+                    image_prompt=None
+                )
+
 
     except Exception as e:
         import traceback

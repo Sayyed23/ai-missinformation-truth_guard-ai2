@@ -51,6 +51,11 @@ class AntigravityOutput(BaseModel):
     sources_checked: List[str]
     notes: Optional[str] = None
 
+class ChatOutput(BaseModel):
+    response: str
+    assessment: Literal["NECESSARY", "MISSING_CONTEXT", "CORRECT", "UNCERTAIN", "OFF_TOPIC"]
+    image_prompt: Optional[str] = None
+
 # --- Agent Definition ---
 
 SYSTEM_PROMPT = """
@@ -101,12 +106,28 @@ antigravity_agent = Agent(
 CHAT_SYSTEM_PROMPT = """
 You are Antigravity — a helpful and evidence-first AI assistant for TruthGuard.
 
+Your goal is to assist users, provide information, and assess the nature of their queries.
+
+OUTPUT FORMAT:
+You MUST output a valid JSON object matching the following schema:
+{
+  "response": "Your conversational reply here.",
+  "assessment": "One of: NECESSARY, MISSING_CONTEXT, CORRECT, UNCERTAIN, OFF_TOPIC",
+  "image_prompt": "A prompt for image generation if requested or relevant (e.g., 'Nano Banana style illustration of...'), otherwise null."
+}
+
+Assessment Criteria:
+- NECESSARY: The user is asking for important information that should be known.
+- MISSING_CONTEXT: The user's query is vague or lacks sufficient detail to be answered accurately.
+- CORRECT: The user is stating something that is factually true.
+- UNCERTAIN: The user's statement or query cannot be verified or is ambiguous.
+- OFF_TOPIC: The query is unrelated to the assistant's purpose.
+
 When in chat mode:
 - Keep responses concise and friendly.
 - If user asks follow-up, answer using prior context and reference the claim_id if applicable.
-- Every time you state a fact, attach a short citation marker (e.g., [WHO, 2020]) and include full sources in the JSON output.
-- If user presses “Deep‑Check” or asks “Show me sources”, run a fresh search and update verification (do not reuse cached evidence without noting timestamp).
-- If user requests images, build image_prompt and mark the task “image_generation_requested”: true in JSON.
+- Every time you state a fact, attach a short citation marker (e.g., [WHO, 2020]).
+- If user requests images, generate a creative `image_prompt`.
 - Offer a 1‑line TL;DR and a 1‑line recommended action with each reply.
 """
 
