@@ -1,11 +1,21 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from .agent import antigravity_agent, AntigravityOutput
+from .agent import antigravity_agent, antigravity_chat_agent, AntigravityOutput
 from google.adk.runners import InMemoryRunner
 from google.genai.types import Part, UserContent
 import json
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(title="Antigravity Agent API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class VerifyRequest(BaseModel):
     claim: str
@@ -61,6 +71,40 @@ async def verify(request: VerifyRequest):
                 return AntigravityOutput(**data)
             else:
                 raise ValueError(f"Could not parse JSON from response: {cleaned_text}")
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+class ChatRequest(BaseModel):
+    message: str
+    session_id: str = "default_session"
+
+class ChatResponse(BaseModel):
+    response: str
+
+@app.post("/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest):
+    try:
+        runner = InMemoryRunner(agent=antigravity_chat_agent)
+        session = await runner.session_service.create_session(
+            app_name=runner.app_name, user_id="api_user", session_id=request.session_id
+        )
+        content = UserContent(parts=[Part(text=request.message)])
+        
+        final_text = ""
+        async for event in runner.run_async(
+            user_id=session.user_id,
+            session_id=session.id,
+            new_message=content,
+        ):
+            if event.content and event.content.parts:
+                for part in event.content.parts:
+                    if part.text:
+                        final_text += part.text
+        
+        return ChatResponse(response=final_text)
 
     except Exception as e:
         import traceback
