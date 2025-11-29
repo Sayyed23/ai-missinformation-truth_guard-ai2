@@ -245,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen>
                           border: Border.all(color: Colors.grey.shade300),
                         ),
                         child: const Text(
-                          "Ask Antigravity to verify...",
+                          "Ask TruthGuard to verify...",
                           style: TextStyle(color: Colors.black54, fontSize: 15),
                         ),
                       ),

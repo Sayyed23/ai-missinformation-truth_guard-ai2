@@ -137,23 +137,60 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         if (!isUser && imagePrompt != null)
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                // TODO: Implement image generation
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Generating image for: $imagePrompt',
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (msg['show_image'] == true)
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      'https://image.pollinations.ai/prompt/${Uri.encodeComponent(imagePrompt)}',
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return Container(
+                                              height: 350,
+                                              width: double.infinity,
+                                              color: Colors.grey[300],
+                                              child: const Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              ),
+                                            );
+                                          },
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return Container(
+                                              height: 350,
+                                              width: double.infinity,
+                                              color: Colors.grey[300],
+                                              child: const Center(
+                                                child: Icon(
+                                                  Icons.error,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                    ),
+                                  )
+                                else
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      setState(() {
+                                        msg['show_image'] = true;
+                                      });
+                                    },
+                                    icon: const Icon(Icons.image),
+                                    label: const Text('Generate Infographic'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.deepPurple,
+                                      foregroundColor: Colors.white,
                                     ),
                                   ),
-                                );
-                              },
-                              icon: const Icon(Icons.image),
-                              label: const Text('Generate Image'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.deepPurple,
-                                foregroundColor: Colors.white,
-                              ),
+                              ],
                             ),
                           ),
                       ],
