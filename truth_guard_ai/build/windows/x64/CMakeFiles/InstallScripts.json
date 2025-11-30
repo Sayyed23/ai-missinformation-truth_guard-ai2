@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"D:/ai-missinformation-truth_guard-ai2/truth_guard_ai/build/windows/x64/cmake_install.cmake",
+		"D:/ai-missinformation-truth_guard-ai2/truth_guard_ai/build/windows/x64/flutter/cmake_install.cmake",
+		"D:/ai-missinformation-truth_guard-ai2/truth_guard_ai/build/windows/x64/runner/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

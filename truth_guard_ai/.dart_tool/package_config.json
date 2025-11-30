@@ -279,9 +279,9 @@
     },
     {
       "name": "meta",
-      "rootUri": "file:///C:/Users/Ismail%20Sayyed/AppData/Local/Pub/Cache/hosted/pub.dev/meta-1.16.0",
+      "rootUri": "file:///C:/Users/Ismail%20Sayyed/AppData/Local/Pub/Cache/hosted/pub.dev/meta-1.17.0",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.5"
     },
     {
       "name": "mime",
@@ -471,19 +471,19 @@
     },
     {
       "name": "test",
-      "rootUri": "file:///C:/Users/Ismail%20Sayyed/AppData/Local/Pub/Cache/hosted/pub.dev/test-1.26.2",
+      "rootUri": "file:///C:/Users/Ismail%20Sayyed/AppData/Local/Pub/Cache/hosted/pub.dev/test-1.26.3",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "test_api",
-      "rootUri": "file:///C:/Users/Ismail%20Sayyed/AppData/Local/Pub/Cache/hosted/pub.dev/test_api-0.7.6",
+      "rootUri": "file:///C:/Users/Ismail%20Sayyed/AppData/Local/Pub/Cache/hosted/pub.dev/test_api-0.7.7",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "test_core",
-      "rootUri": "file:///C:/Users/Ismail%20Sayyed/AppData/Local/Pub/Cache/hosted/pub.dev/test_core-0.6.11",
+      "rootUri": "file:///C:/Users/Ismail%20Sayyed/AppData/Local/Pub/Cache/hosted/pub.dev/test_core-0.6.12",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
@@ -561,8 +561,8 @@
     }
   ],
   "generator": "pub",
-  "generatorVersion": "3.9.2",
+  "generatorVersion": "3.10.1",
   "flutterRoot": "file:///C:/Flutter/flutter",
-  "flutterVersion": "3.35.7",
+  "flutterVersion": "3.38.3",
   "pubCache": "file:///C:/Users/Ismail%20Sayyed/AppData/Local/Pub/Cache"
 }

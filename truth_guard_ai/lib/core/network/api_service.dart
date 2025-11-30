@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 
 final apiServiceProvider = Provider((ref) => ApiService());
 
 class ApiService {
-  // Use 10.0.2.2 for Android emulator, localhost for Web/Windows
-  // For now, assuming Web/Windows or physical device on same network
-  static const String baseUrl = 'http://127.0.0.1:8002';
+  // Use relative path for production (Vercel) or localhost for development
+  // Note: For Android emulator use 10.0.2.2, for iOS simulator use 127.0.0.1
+  static const String _baseUrl = kReleaseMode
+      ? "/api"
+      : "http://127.0.0.1:8002";
 
   Future<Map<String, dynamic>> verifyClaim(
     String claim, {
@@ -16,7 +19,7 @@ class ApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/verify'),
+        Uri.parse('$_baseUrl/verify'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'claim': claim,
@@ -45,7 +48,7 @@ class ApiService {
   }) async* {
     final client = http.Client();
     try {
-      final request = http.Request('POST', Uri.parse('$baseUrl/chat'));
+      final request = http.Request('POST', Uri.parse('$_baseUrl/chat'));
       request.headers['Content-Type'] = 'application/json';
       request.body = jsonEncode({
         'message': message,

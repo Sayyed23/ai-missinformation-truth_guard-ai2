@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\ai-missinformation-truth_guard-ai2\truth_guard_ai\build\windows\x64\CMakeFiles\060e9ae4700307ac9426d51842e98b3f\flutter_windows.dll.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\ai-missinformation-truth_guard-ai2\truth_guard_ai\build\windows\x64\CMakeFiles\5a7e7298ef06e198da88776021d00f14\flutter_assemble.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\ai-missinformation-truth_guard-ai2\truth_guard_ai\windows\flutter\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\ai-missinformation-truth_guard-ai2\truth_guard_ai\build\windows\x64\flutter\CMakeFiles\flutter_assemble" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{69D48054-0DEE-3A21-9D15-97F6B8D1CC45}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

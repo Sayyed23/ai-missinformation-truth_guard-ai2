@@ -1,0 +1,10 @@
+^D:\AI-MISSINFORMATION-TRUTH_GUARD-AI2\TRUTH_GUARD_AI\BUILD\WINDOWS\X64\CMAKEFILES\A638634881600B1AF3767CE3289CEE77\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:/ai-missinformation-truth_guard-ai2/truth_guard_ai/windows -BD:/ai-missinformation-truth_guard-ai2/truth_guard_ai/build/windows/x64 --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/ai-missinformation-truth_guard-ai2/truth_guard_ai/build/windows/x64/truth_guard_ai.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

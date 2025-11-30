@@ -199,6 +199,9 @@ async def chat(request: ChatRequest):
 
             content = UserContent(parts=[Part(text=prompt_text)])
             
+            # Immediate feedback
+            yield json.dumps({"type": "log", "message": "Starting analysis..."}) + "\n"
+
             final_text = ""
             async for event in runner.run_async(
                 user_id=session.user_id,
@@ -210,6 +213,10 @@ async def chat(request: ChatRequest):
                 log_message = "Processing..."
                 event_str = str(event)
                 
+                # Generic fallback for any tool use
+                if "tool_call" in event_str:
+                     log_message = "Using Tool..."
+
                 if request.agent_name == "Deep Search":
                     # Deep Search specific logs
                     if "plan_generator" in event_str:
@@ -236,6 +243,10 @@ async def chat(request: ChatRequest):
                     # TruthGuard
                     if "google_search" in event_str:
                         log_message = "Verifying with Google Search..."
+                    elif "model_call" in event_str:
+                        log_message = "Analyzing Evidence..."
+                    elif "tool_result" in event_str:
+                        log_message = "Processing Search Results..."
                 
                 # Send log event
                 # We only send if it's a meaningful state change or periodically?
@@ -275,10 +286,10 @@ async def chat(request: ChatRequest):
             
             yield json.dumps({"type": "result", "data": response_data}) + "\n"
 
-        except Exception as e:
+        except Exception:
             import traceback
             traceback.print_exc()
-            yield json.dumps({"type": "error", "message": str(e)}) + "\n"
+            yield json.dumps({"type": "error", "message": "An internal server error occurred"}) + "\n"
 
     return StreamingResponse(event_generator(), media_type="application/x-ndjson")
 

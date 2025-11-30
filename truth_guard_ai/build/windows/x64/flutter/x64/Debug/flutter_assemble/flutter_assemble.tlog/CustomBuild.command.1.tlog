@@ -1,0 +1,28 @@
+^D:\AI-MISSINFORMATION-TRUTH_GUARD-AI2\TRUTH_GUARD_AI\BUILD\WINDOWS\X64\CMAKEFILES\060E9AE4700307AC9426D51842E98B3F\FLUTTER_WINDOWS.DLL.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E env FLUTTER_ROOT=C:\Flutter\flutter PROJECT_DIR=D:\ai-missinformation-truth_guard-ai2\truth_guard_ai FLUTTER_ROOT=C:\Flutter\flutter FLUTTER_EPHEMERAL_DIR=D:\ai-missinformation-truth_guard-ai2\truth_guard_ai\windows\flutter\ephemeral PROJECT_DIR=D:\ai-missinformation-truth_guard-ai2\truth_guard_ai FLUTTER_TARGET=D:\ai-missinformation-truth_guard-ai2\truth_guard_ai\lib\main.dart DART_DEFINES=RkxVVFRFUl9WRVJTSU9OPTMuMzguMw==,RkxVVFRFUl9DSEFOTkVMPXN0YWJsZQ==,RkxVVFRFUl9HSVRfVVJMPWh0dHBzOi8vZ2l0aHViLmNvbS9mbHV0dGVyL2ZsdXR0ZXIuZ2l0,RkxVVFRFUl9GUkFNRVdPUktfUkVWSVNJT049MTkwNzRkMTJmNw==,RkxVVFRFUl9FTkdJTkVfUkVWSVNJT049MTNlNjU4NzI1ZA==,RkxVVFRFUl9EQVJUX1ZFUlNJT049My4xMC4x DART_OBFUSCATION=false TRACK_WIDGET_CREATION=true TREE_SHAKE_ICONS=false PACKAGE_CONFIG=D:\ai-missinformation-truth_guard-ai2\truth_guard_ai\.dart_tool\package_config.json C:/Flutter/flutter/packages/flutter_tools/bin/tool_backend.bat windows-x64 Debug
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\AI-MISSINFORMATION-TRUTH_GUARD-AI2\TRUTH_GUARD_AI\BUILD\WINDOWS\X64\CMAKEFILES\5A7E7298EF06E198DA88776021D00F14\FLUTTER_ASSEMBLE.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\AI-MISSINFORMATION-TRUTH_GUARD-AI2\TRUTH_GUARD_AI\WINDOWS\FLUTTER\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:/ai-missinformation-truth_guard-ai2/truth_guard_ai/windows -BD:/ai-missinformation-truth_guard-ai2/truth_guard_ai/build/windows/x64 --check-stamp-file D:/ai-missinformation-truth_guard-ai2/truth_guard_ai/build/windows/x64/flutter/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
