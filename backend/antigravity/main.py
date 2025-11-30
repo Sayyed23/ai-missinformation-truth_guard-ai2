@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from .agent import antigravity_agent, antigravity_chat_agent, AntigravityOutput
 from google.adk.runners import InMemoryRunner
@@ -6,7 +7,38 @@ from google.genai.types import Part, UserContent
 import json
 from typing import Optional
 
+import sys
+import os
+
+# Add sibling directories to path to import other agents
+current_dir = os.path.dirname(os.path.abspath(__file__))
+backend_dir = os.path.dirname(current_dir)
+sys.path.append(os.path.join(backend_dir, "deep-search"))
+sys.path.append(os.path.join(backend_dir, "llm-auditor"))
+
 from fastapi.middleware.cors import CORSMiddleware
+
+# Import agents
+# Note: We use try-except to avoid crashing if dependencies are missing for other agents
+agents = {}
+
+# 1. Antigravity (TruthGuard)
+agents["TruthGuard"] = antigravity_chat_agent
+
+# 2. Deep Search
+try:
+    from app.agent import root_agent as deep_search_agent
+    agents["Deep Search"] = deep_search_agent
+except ImportError as e:
+    print(f"Could not import Deep Search agent: {e}")
+
+# 3. LLM Auditor
+try:
+    from llm_auditor.agent import llm_auditor as llm_auditor_agent
+    agents["LLM Auditor"] = llm_auditor_agent
+except ImportError as e:
+    print(f"Could not import LLM Auditor agent: {e}")
+
 
 app = FastAPI(title="Antigravity Agent API")
 
@@ -137,68 +169,118 @@ class ChatRequest(BaseModel):
     message: str
     session_id: str = "default_session"
     language: str = "English"
+    agent_name: str = "TruthGuard"
 
 class ChatResponse(BaseModel):
     response: str
     assessment: str
     image_prompt: Optional[str] = None
 
-@app.post("/chat", response_model=ChatResponse)
+@app.post("/chat")
 async def chat(request: ChatRequest):
-    try:
-        runner = InMemoryRunner(agent=antigravity_chat_agent)
-        session = await runner.session_service.create_session(
-            app_name=runner.app_name, user_id="api_user", session_id=request.session_id
-        )
-        content = UserContent(parts=[Part(text=f"{request.message}\n(Respond in {request.language})")])
-        
-        final_text = ""
-        async for event in runner.run_async(
-            user_id=session.user_id,
-            session_id=session.id,
-            new_message=content,
-        ):
-            if event.content and event.content.parts:
-                for part in event.content.parts:
-                    if part.text:
-                        final_text += part.text
-        
-        # Parse the JSON output
-        cleaned_text = final_text.strip()
-        if cleaned_text.startswith("```json"):
-            cleaned_text = cleaned_text[7:]
-        elif cleaned_text.startswith("```"):
-            cleaned_text = cleaned_text[3:]
-        
-        if cleaned_text.endswith("```"):
-            cleaned_text = cleaned_text[:-3]
-            
-        cleaned_text = cleaned_text.strip()
-        
+    async def event_generator():
         try:
-            data = json.loads(cleaned_text)
-            return ChatResponse(**data)
-        except json.JSONDecodeError:
-             # Fallback: try to find JSON object if there's extra text
-            start = cleaned_text.find('{')
-            end = cleaned_text.rfind('}')
-            if start != -1 and end != -1:
-                json_str = cleaned_text[start:end+1]
-                data = json.loads(json_str)
-                return ChatResponse(**data)
+            selected_agent = agents.get(request.agent_name, antigravity_chat_agent)
+            runner = InMemoryRunner(agent=selected_agent)
+            session = await runner.session_service.create_session(
+                app_name=runner.app_name, user_id="api_user", session_id=request.session_id
+            )
+            
+            # Adjust prompt based on agent
+            if request.agent_name == "Deep Search":
+                # Deep Search expects a research topic
+                prompt_text = f"Research Topic: {request.message}\n(Language: {request.language})"
+            elif request.agent_name == "LLM Auditor":
+                # LLM Auditor expects a claim or text to audit
+                prompt_text = f"Audit this: {request.message}\n(Language: {request.language})"
             else:
-                # Fallback for plain text response (if agent fails to output JSON)
-                return ChatResponse(
-                    response=final_text,
-                    assessment="UNCERTAIN",
-                    image_prompt=None
-                )
+                # TruthGuard
+                prompt_text = f"{request.message}\n(Respond in {request.language})"
 
+            content = UserContent(parts=[Part(text=prompt_text)])
+            
+            final_text = ""
+            async for event in runner.run_async(
+                user_id=session.user_id,
+                session_id=session.id,
+                new_message=content,
+            ):
+                # Log tool use or thoughts if available
+                # Inspect event for specific agent activities
+                log_message = "Processing..."
+                event_str = str(event)
+                
+                if request.agent_name == "Deep Search":
+                    # Deep Search specific logs
+                    if "plan_generator" in event_str:
+                        log_message = "Generating Research Plan..."
+                    elif "section_researcher" in event_str:
+                         # Try to extract section info if possible, otherwise generic
+                        log_message = "Researching Section..."
+                    elif "google_search" in event_str:
+                        log_message = "Searching the Web..."
+                    elif "report_composer" in event_str:
+                        log_message = "Composing Final Report..."
+                    elif "enhanced_search_executor" in event_str:
+                        log_message = "Executing Enhanced Search..."
+                    elif "interactive_planner_agent" in event_str:
+                        log_message = "Refining Plan..."
+                elif request.agent_name == "LLM Auditor":
+                     if "critic_agent" in event_str:
+                        log_message = "Critiquing Content..."
+                     elif "reviser_agent" in event_str:
+                        log_message = "Revising Content..."
+                     elif "google_search" in event_str:
+                        log_message = "Verifying Claims..."
+                else:
+                    # TruthGuard
+                    if "google_search" in event_str:
+                        log_message = "Verifying with Google Search..."
+                
+                # Send log event
+                # We only send if it's a meaningful state change or periodically?
+                # For now, streaming every event as a potential log update is fine, 
+                # frontend can debounce or just show the latest.
+                yield json.dumps({"type": "log", "message": log_message}) + "\n"
 
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
+            # Parse the JSON output
+            cleaned_text = final_text.strip()
+            if cleaned_text.startswith("```json"):
+                cleaned_text = cleaned_text[7:]
+            elif cleaned_text.startswith("```"):
+                cleaned_text = cleaned_text[3:]
+            
+            if cleaned_text.endswith("```"):
+                cleaned_text = cleaned_text[:-3]
+                
+            cleaned_text = cleaned_text.strip()
+            
+            response_data = {}
+            try:
+                response_data = json.loads(cleaned_text)
+            except json.JSONDecodeError:
+                 # Fallback: try to find JSON object if there's extra text
+                start = cleaned_text.find('{')
+                end = cleaned_text.rfind('}')
+                if start != -1 and end != -1:
+                    json_str = cleaned_text[start:end+1]
+                    response_data = json.loads(json_str)
+                else:
+                    # Fallback for plain text response
+                    response_data = {
+                        "response": final_text,
+                        "assessment": "UNCERTAIN",
+                        "image_prompt": None
+                    }
+            
+            yield json.dumps({"type": "result", "data": response_data}) + "\n"
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            yield json.dumps({"type": "error", "message": str(e)}) + "\n"
+
+    return StreamingResponse(event_generator(), media_type="application/x-ndjson")
 
 if __name__ == "__main__":
     import uvicorn

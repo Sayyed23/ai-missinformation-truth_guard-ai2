@@ -14,11 +14,15 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final List<Map<String, dynamic>> _messages =
-      []; // {'role': 'user'|'ai', 'content': '...', 'assessment': '...', 'image_prompt': '...'}
+      []; // {'role': 'user'|'ai', 'content': '...', 'assessment': '...', 'image_prompt': '...', 'logs': List<String>}
   bool _isLoading = false;
+  String? _loadingMessage;
+  List<String> _currentLogs = [];
   final ScrollController _scrollController = ScrollController();
   String _selectedLanguage = 'English';
   final List<String> _languages = ['English', 'Hindi', 'Marathi'];
+  String _selectedAgent = 'TruthGuard';
+  final List<String> _agents = ['TruthGuard', 'Deep Search', 'LLM Auditor'];
 
   @override
   void initState() {
@@ -41,33 +45,58 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     setState(() {
       _messages.add({'role': 'user', 'content': message});
       _isLoading = true;
+      _loadingMessage = "Starting...";
+      _currentLogs = [];
       _messageController.clear();
     });
     _scrollToBottom();
 
     try {
       final apiService = ref.read(apiServiceProvider);
-      final response = await apiService.chat(
+      final stream = apiService.chat(
         message,
         language: _selectedLanguage,
+        agentName: _selectedAgent,
       );
-      setState(() {
-        _messages.add({
-          'role': 'ai',
-          'content': response['response'],
-          'assessment': response['assessment'],
-          'image_prompt': response['image_prompt'],
-        });
-      });
+
+      await for (final event in stream) {
+        if (event['type'] == 'log') {
+          setState(() {
+            _loadingMessage = event['message'];
+            _currentLogs.add(event['message']);
+          });
+        } else if (event['type'] == 'result') {
+          final data = event['data'];
+          setState(() {
+            _messages.add({
+              'role': 'ai',
+              'content': data['response'],
+              'assessment': data['assessment'],
+              'image_prompt': data['image_prompt'],
+              'logs': List<String>.from(_currentLogs),
+            });
+            _isLoading = false;
+            _loadingMessage = null;
+            _currentLogs = [];
+          });
+        } else if (event['type'] == 'error') {
+          setState(() {
+            _messages.add({
+              'role': 'ai',
+              'content': 'Error: ${event['message']}',
+            });
+            _isLoading = false;
+            _loadingMessage = null;
+          });
+        }
+        _scrollToBottom();
+      }
     } catch (e) {
       setState(() {
         _messages.add({'role': 'ai', 'content': 'Error: $e'});
-      });
-    } finally {
-      setState(() {
         _isLoading = false;
+        _loadingMessage = null;
       });
-      _scrollToBottom();
     }
   }
 
@@ -108,28 +137,56 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: _selectedLanguage,
-                icon: const Icon(Icons.language, color: Colors.blueAccent),
-                items: _languages.map((String lang) {
-                  return DropdownMenuItem<String>(
-                    value: lang,
-                    child: Text(
-                      lang,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedLanguage = newValue!;
-                  });
-                },
-              ),
+            child: Row(
+              children: [
+                DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedAgent,
+                    icon: const Icon(Icons.person, color: Colors.deepPurple),
+                    items: _agents.map((String agent) {
+                      return DropdownMenuItem<String>(
+                        value: agent,
+                        child: Text(
+                          agent,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedAgent = newValue!;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedLanguage,
+                    icon: const Icon(Icons.language, color: Colors.blueAccent),
+                    items: _languages.map((String lang) {
+                      return DropdownMenuItem<String>(
+                        value: lang,
+                        child: Text(
+                          lang,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedLanguage = newValue!;
+                      });
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -182,6 +239,61 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),
+                            ),
+                          ),
+
+                        if (!isUser &&
+                            msg['logs'] != null &&
+                            (msg['logs'] as List).isNotEmpty)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            child: ExpansionTile(
+                              title: const Text(
+                                "View Thought Process",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blueGrey,
+                                ),
+                              ),
+                              dense: true,
+                              tilePadding: EdgeInsets.zero,
+                              childrenPadding: const EdgeInsets.all(8),
+                              collapsedShape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                side: BorderSide(color: Colors.grey.shade300),
+                              ),
+                              children: [
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(8),
+                                  color: Colors.black87,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: (msg['logs'] as List).map<Widget>(
+                                      (log) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 4,
+                                          ),
+                                          child: Text(
+                                            "> $log",
+                                            style: const TextStyle(
+                                              color: Colors.greenAccent,
+                                              fontFamily: 'monospace',
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ).toList(),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         Text(msg['content'] ?? ''),
@@ -252,10 +364,59 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           ),
           if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: CircularProgressIndicator(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    _loadingMessage ?? "Thinking...",
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
             ),
+          if (_isLoading && _currentLogs.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black87,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              height: 100,
+              child: ListView.builder(
+                reverse: true,
+                itemCount: _currentLogs.length,
+                itemBuilder: (context, index) {
+                  // Show logs in reverse order (newest at bottom visually if not reversed, but we want auto scroll)
+                  // Actually reverse: true puts index 0 at bottom.
+                  // Let's just show the list normally but auto scroll?
+                  // Or just show the last few?
+                  // Let's show all, reverse order so newest is at top? No, newest at bottom is standard terminal.
+                  // If reverse=true, index 0 is bottom. So we need to reverse the list or access from end.
+                  final log = _currentLogs[_currentLogs.length - 1 - index];
+                  return Text(
+                    "> $log",
+                    style: const TextStyle(
+                      color: Colors.greenAccent,
+                      fontFamily: 'monospace',
+                      fontSize: 10,
+                    ),
+                  );
+                },
+              ),
+            ),
+
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(

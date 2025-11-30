@@ -37,32 +37,46 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> chat(
+  Stream<Map<String, dynamic>> chat(
     String message, {
     String sessionId = 'default_session',
     String language = 'English',
-  }) async {
+    String agentName = 'TruthGuard',
+  }) async* {
+    final client = http.Client();
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/chat'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'message': message,
-          'session_id': sessionId,
-          'language': language,
-        }),
-      );
+      final request = http.Request('POST', Uri.parse('$baseUrl/chat'));
+      request.headers['Content-Type'] = 'application/json';
+      request.body = jsonEncode({
+        'message': message,
+        'session_id': sessionId,
+        'language': language,
+        'agent_name': agentName,
+      });
+
+      final response = await client.send(request);
 
       if (response.statusCode == 200) {
-        // The backend now returns { "response": "...", "assessment": "...", "image_prompt": "..." }
-        return jsonDecode(response.body);
+        final stream = response.stream
+            .transform(utf8.decoder)
+            .transform(const LineSplitter());
+
+        await for (final line in stream) {
+          if (line.trim().isNotEmpty) {
+            try {
+              yield jsonDecode(line);
+            } catch (e) {
+              print('Error parsing JSON line: $e');
+            }
+          }
+        }
       } else {
-        throw Exception(
-          'Failed to send message: ${response.statusCode} ${response.body}',
-        );
+        throw Exception('Failed to send message: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error connecting to server: $e');
+    } finally {
+      client.close();
     }
   }
 }
